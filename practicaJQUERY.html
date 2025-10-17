@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <img src="" alt="">
+    <h1>PRACTICA JQUERY</h1>
+    <select id="selectalumnos">Seleccione cursos
+        <option></option>
+    </select>
+    <div id="contenedor"></div>
+    <ul id="listaalumnos">
+
+    </ul>
+
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        let url = "https://apiejemplos.azurewebsites.net/";
+        $(document).ready(function () {
+            loadCursos();
+            $("#selectalumnos").change(function () {
+                let añoseleccionado = $("#selectalumnos").val();
+                console.log(añoseleccionado);
+                let requestalumnos = "/api/Alumnos/FiltrarCurso/" + añoseleccionado;
+                $.ajax({
+                    url: url + requestalumnos,
+                    method: "GET",
+                    success: function (data) {
+                        console.log("Leyendo Alumnos");
+                        var html = "";
+
+                        $.each(data, function (index, alumno) {
+                            var li = $("<li>", { "text": alumno.nombre +" "+ alumno.apellidos });
+                            var boton = $("<button>"
+                                , {
+                                    "text": "Detalles ",
+                                    "value": alumno.idAlumno
+                                });
+                            li.append(boton);
+                            $("#listaalumnos").append(li);
+
+                            boton.click(function () {
+                                let idalumno = $(this).val();
+                                console.log("leyendo");
+                                let requestdetalles = "api/alumnos/findalumno/" + idalumno;
+                                $.ajax({
+                                    url: url + requestdetalles,
+                                    method: "GET",
+                                    success: function (data) {
+                                        console.log("Leyendo Alumnos");
+                                        var html2 = "";
+                                        var imagen=$("img");
+                                        imagen.attr("src",alumno.imagen);
+                                        
+                                            html2 += "<h1>" + alumno.nombre +" "+ alumno.apellidos+ "</h1>"
+                                            html2 += "<h2>"+" Id Alumno"+ alumno.idAlumno+ "</h2>"
+                                           
+                                           
+
+                                        
+                                        $("#contenedor").html(html2);
+                                        
+                                    }
+                                })
+                            })
+                        });
+
+                    },
+
+                })
+
+
+
+            })
+
+
+
+        })
+
+
+
+
+
+
+
+
+
+        function loadCursos() {
+            let request = "api/Alumnos/cursos"
+            $.getJSON(url + request, function (data) {
+                console.log("Leyendo Cursos");
+                var html = "";
+                $.each(data, function (index, cursos) {
+                    html += "<option value='" + cursos + "'>" + cursos + "</option>";
+                });
+                $("#selectalumnos").append(html);
+
+            })
+
+        }
+
+
+
+    </script>
+
+</body>
+
+</html>
